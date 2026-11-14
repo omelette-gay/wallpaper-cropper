@@ -4,6 +4,8 @@ Crop photos to your exact wallpaper resolution. Drop in a batch, position the cr
 
 **Use it:** https://wallpaper.omelette.gay
 
+**How to use it:** [user-instructions.md](user-instructions.md)
+
 ## Features
 
 - Presets for common resolutions (ultrawide, 1440p, 4K, 32:9, phone) or any custom size
