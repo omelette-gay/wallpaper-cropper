@@ -2,7 +2,7 @@
 
 Crop photos to your exact wallpaper resolution. Drop in a batch, position the crop on each one, and download them all as a zip. There's optional AI upscaling for photos that are too small. Everything runs in your browser and nothing is uploaded.
 
-**Use it:** https://omelette-gay.github.io/wallpaper-cropper/
+**Use it:** https://wallpaper.omelette.gay
 
 ## Features
 
