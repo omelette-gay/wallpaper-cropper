@@ -36,6 +36,37 @@ python3 -m http.server
 
 Then open http://localhost:8000. Opening `index.html` straight from disk works for cropping, but AI upscaling needs it served over HTTP.
 
+## Updating dependencies
+
+The files in `lib/`, `models/` and `fonts/` are downloaded by [scripts/vendor.sh](scripts/vendor.sh), which lists their versions. Renovate raises a pull request when a new version comes out, and the `vendor` workflow then commits the new files to that pull request.
+
+The site deploys from `main` on GitHub Pages, so merging the pull request is the deploy. Test it on the branch first:
+
+1. Wait for the "Download vendored files…" commit from the workflow on the pull request. Until it's there, only the version number has changed.
+2. Check out the branch and serve it:
+
+   ```sh
+   gh pr checkout <PR number>
+   bash scripts/test-images.sh    # first time only: downloads the test photos into test-images/
+   python3 -m http.server
+   ```
+
+3. Open http://localhost:8000 in a private window, or with DevTools → Network → "Disable cache" ticked, so the browser doesn't use old copies of the files. Keep DevTools → Console open to catch errors.
+4. Pick the 1080p preset and test what the update touches, using the photos in `test-images/`:
+
+   | Updated | Photos | Check |
+   |---|---|---|
+   | AI upscaling (TensorFlow.js, UpscalerJS, ESRGAN models) | `upscale-x2-*`, `upscale-x3-*`, `upscale-x4-*` | Each one uses a different AI model; the yellow warning shows how much it's upscaled. Make sure "AI upscale failed, used Lanczos instead" doesn't appear. |
+   | pica | `large-*` | Check the output is sharp, not blocky. |
+   | JSZip | all of them | Click "Download all (.zip)" and check the zip opens. |
+   | Fonts | any | Check the text still looks right. |
+
+   Dropping all five photos in at once covers everything in one go.
+
+5. Merge. After an AI upscaling update, try one upscale on a phone once it's live, as phone GPUs are where TensorFlow.js is most likely to break.
+
+To update something by hand, change its version in `scripts/vendor.sh`, run `bash scripts/vendor.sh` and test the same way.
+
 ## Limitations
 
 - iPhone HEIC photos aren't supported by most browsers; export them as JPEG first.
