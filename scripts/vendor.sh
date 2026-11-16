@@ -8,7 +8,7 @@ set -euo pipefail
 cd "$(dirname "$0")/.."
 
 # renovate: datasource=npm depName=@tensorflow/tfjs
-TFJS_VERSION="4.11.0"
+TFJS_VERSION="4.22.0"
 # renovate: datasource=npm depName=upscaler
 UPSCALER_VERSION="1.0.0"
 # renovate: datasource=npm depName=@upscalerjs/esrgan-medium
