@@ -28,30 +28,33 @@ Crop photos to your exact wallpaper resolution. Drop in a batch, position the cr
 
 ## Running locally
 
-It's a static site with no build step. Serve the folder with anything, for example:
+It's built with [Vite](https://vite.dev), and the dependencies come from npm. You need Node.js (the version in `.nvmrc`). From the repo folder:
 
 ```sh
-python3 -m http.server
+npm ci          # install the exact versions in package-lock.json
+npm run dev     # serve with live reload at http://localhost:5173
 ```
 
-Then open http://localhost:8000. Opening `index.html` straight from disk works for cropping, but AI upscaling needs it served over HTTP.
+`npm run build` builds the site into `dist/`, and `npm run preview` serves that build at http://localhost:4173.
+
+Pushing to `main` builds the site and deploys it to GitHub Pages ([.github/workflows/pages.yml](.github/workflows/pages.yml)). The same workflow builds every pull request as a check.
 
 ## Updating dependencies
 
-The files in `lib/`, `models/` and `fonts/` are downloaded by [scripts/vendor.sh](scripts/vendor.sh), which lists their versions. Renovate raises a pull request when a new version comes out, and the `vendor` workflow then commits the new files to that pull request.
+Renovate raises a pull request when a dependency in `package.json` has a new version. Merging to `main` is the deploy, so test it on the branch first:
 
-The site deploys from `main` on GitHub Pages, so merging the pull request is the deploy. Test it on the branch first:
-
-1. Wait for the "Download vendored files…" commit from the workflow on the pull request. Until it's there, only the version number has changed.
-2. Check out the branch and serve it:
+1. Wait for the `pages` check on the pull request to pass. That means it builds.
+2. Check out the branch, install and serve the production build:
 
    ```sh
-   gh pr checkout <PR number>
+   git fetch
+   git switch <branch name from the pull request, e.g. renovate/ai-upscaling>
+   npm ci
    bash scripts/test-images.sh    # first time only: downloads the test photos into test-images/
-   python3 -m http.server
+   npm run build && npm run preview
    ```
 
-3. Open http://localhost:8000 in a private window, or with DevTools → Network → "Disable cache" ticked, so the browser doesn't use old copies of the files. Keep DevTools → Console open to catch errors.
+3. Open http://localhost:4173. Keep DevTools → Console open to catch errors.
 4. Pick the 1080p preset and test what the update touches, using the photos in `test-images/`:
 
    | Updated | Photos | Check |
@@ -60,12 +63,16 @@ The site deploys from `main` on GitHub Pages, so merging the pull request is the
    | pica | `large-*` | Check the output is sharp, not blocky. |
    | JSZip | all of them | Click "Download all (.zip)" and check the zip opens. |
    | Fonts | any | Check the text still looks right. |
+   | Vite | all of them | Everything above; a Vite update changes how the whole site is built. |
 
    Dropping all five photos in at once covers everything in one go.
 
 5. Merge. After an AI upscaling update, try one upscale on a phone once it's live, as phone GPUs are where TensorFlow.js is most likely to break.
+6. Switch back with `git switch main` and `git pull`.
 
-To update something by hand, change its version in `scripts/vendor.sh`, run `bash scripts/vendor.sh` and test the same way.
+To update something by hand, run `npm install <package>@<version>` and test the same way.
+
+UpscalerJS says it needs TensorFlow.js 4.11.x, but newer versions work, so the `overrides` entry in `package.json` makes it use the same TensorFlow.js as the site. If an AI upscaling update breaks, that's the first thing to suspect.
 
 ## Limitations
 
@@ -76,4 +83,4 @@ To update something by hand, change its version in `scripts/vendor.sh`, run `bas
 
 MIT. Provided as-is, without warranty; see [LICENSE](LICENSE).
 
-Third-party code and models in `lib/` and `models/` keep their own licences: TensorFlow.js (Apache-2.0), UpscalerJS and its models (MIT), idealo image-super-resolution weights (Apache-2.0), pica (MIT), JSZip (MIT), Inter and JetBrains Mono fonts (SIL OFL 1.1).
+The npm dependencies bundled into the site keep their own licences: TensorFlow.js (Apache-2.0), UpscalerJS and its models (MIT), idealo image-super-resolution weights (Apache-2.0), pica (MIT), JSZip (MIT), Inter, Fraunces and JetBrains Mono fonts (SIL OFL 1.1).

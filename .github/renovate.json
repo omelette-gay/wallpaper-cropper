@@ -3,21 +3,9 @@
   "extends": [
     "config:recommended"
   ],
-  "gitIgnoredAuthors": [
-    "41898282+github-actions[bot]@users.noreply.github.com"
-  ],
-  "customManagers": [
-    {
-      "customType": "regex",
-      "description": "Versions of the files in lib/, models/ and fonts/. .github/workflows/vendor.yml downloads the new files",
-      "managerFilePatterns": [
-        "/^scripts/vendor\\.sh$/"
-      ],
-      "matchStrings": [
-        "# renovate: datasource=(?<datasource>\\S+)\\s+depName=(?<depName>\\S+)\\n\\w+_VERSION=\"(?<currentValue>[^\"]+)\""
-      ]
-    }
-  ],
+  "lockFileMaintenance": {
+    "enabled": true
+  },
   "packageRules": [
     {
       "description": "UpscalerJS and its models run on TensorFlow.js, so update them together",
@@ -27,6 +15,10 @@
     {
       "matchPackageNames": ["@fontsource/**"],
       "groupName": "fonts"
+    },
+    {
+      "matchPackageNames": ["vite", "vite-plugin-static-copy"],
+      "groupName": "Vite"
     }
   ]
 }
